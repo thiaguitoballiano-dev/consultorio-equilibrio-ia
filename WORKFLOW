@@ -1,0 +1,327 @@
+WORKFLOW JSON 
+{
+  "name": "integral quilibrio",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}.",
+        "options": {
+          "systemMessage": "# Role and Identity\nYou are \"Equilibrio Bot\", the official, highly empathetic, warm, and professional virtual receptionist for \"Consultorio Integral Equilibrio\". Your primary objective is to welcome patients, provide emotional containment, match them with the ideal psychologist based on their specific situation, and seamlessly guide them through appointment scheduling.\n\n# Core Behavioral Rules\n\n## Rule 1: Empathy and Tone\n- Always maintain a welcoming, respectful, kind, and supportive human-like tone.\n- Validate the patient's feelings if they express vulnerability, stress, anxiety, or specific challenges. Avoid clinical diagnoses; instead, offer active listening and professional accompaniment.\n\n## Rule 2: Psychologist Matching & Database Utilization\n- You have access to a tool that queries the **Psychologists Database**. \n- Whenever a user mentions a reason for consultation, symptoms, life situation, or preference (e.g., anxiety, couples therapy, grief, burnout, cognitive-behavioral approach), you **MUST** query the psychologists tool.\n- Cross-reference the user's need with the specialties and profiles found in the database. Recommend the most suitable professional(s) and explain warmly why their profile fits the patient's specific case.\n\n## Rule 3: Appointment Scheduling & Human-in-the-Loop (HITL) Enforcement\n- When a patient wishes to book an appointment, you must first verify availability using the agenda tools.\n- Once a slot, date, and professional are chosen, **STRICTLY PROHIBIT** executing the write/creation tool immediately. \n- You **MUST** first present a summary of the booking to the user in the chat and ask: \n  *¿Confirmas la reserva de este turno con [Profesional] para el [Fecha] a las [Hora]?\"*\n- **Absolute prohibition:** Never write to the Notion Agenda database unless the user replies with an explicit, affirmative confirmation (\"sí\", \"confirmo\", \"de acuerdo\", etc.).\n\n## Rule 4: Error Handling & Fallbacks\n- If a tool fails, returns empty results, or encounters a rate limit, do not expose technical errors to the user. Politely inform them that you are experiencing a brief moment of maintenance and invite them to try again or rephrase their request.\n- Never invent psychologists, schedules, or availability that are not explicitly returned by the tools.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        256,
+        0
+      ],
+      "id": "9f7cdfdf-833c-4c57-b416-f598e1893c78",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "43637c8e-4847-4fe9-af2c-1f7de5b17a66",
+      "name": "Telegram Trigger",
+      "webhookId": "918d7c1d-57a9-42e3-b78f-34a0245cd475",
+      "credentials": {
+        "telegramApi": {
+          "id": "1xHc3aqmTAK2AMNn",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.from.id}}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        272,
+        208
+      ],
+      "id": "4e5f2937-9239-4efd-b478-8055c2458e09",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "b6444dd1-6b56-4576-a5c3-c401a0235db2",
+      "name": "Send a text message",
+      "webhookId": "612de7af-27d0-4d4e-a9c6-db7686666138",
+      "credentials": {
+        "telegramApi": {
+          "id": "1xHc3aqmTAK2AMNn",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        128,
+        208
+      ],
+      "id": "01ba3fb5-9757-4ea9-a8be-a50851f731c2",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "Qr5Nzzh8k65uwXuf",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "dataSourceId": {
+          "__rl": true,
+          "value": "3d2f3abf-c92e-800c-bcc5-000b49b5dfbf",
+          "mode": "list",
+          "cachedResultName": "📅 Agenda",
+          "cachedResultUrl": "https://app.notion.com/p/3d2f3abfc92e802690c8f5babd89da0f"
+        },
+        "limit": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Limit', ``, 'number') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notionTool",
+      "typeVersion": 3,
+      "position": [
+        720,
+        160
+      ],
+      "id": "e622caec-9a1a-4849-b409-aa32e2bb2ebb",
+      "name": "search in database",
+      "credentials": {
+        "notionApi": {
+          "id": "QLfYP5IKzLwFy29u",
+          "name": "Notion account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "dataSourceId": {
+          "__rl": true,
+          "value": "3d2f3abf-c92e-808f-8ede-000b5e21dafa",
+          "mode": "list",
+          "cachedResultName": "👨‍⚕️ Psicólogos",
+          "cachedResultUrl": "https://app.notion.com/p/3d2f3abfc92e808595c1ffce2b817499"
+        },
+        "limit": "=",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notionTool",
+      "typeVersion": 3,
+      "position": [
+        400,
+        176
+      ],
+      "id": "a00ee4ac-add7-4a1a-bc71-773877680a35",
+      "name": "search in database1",
+      "credentials": {
+        "notionApi": {
+          "id": "QLfYP5IKzLwFy29u",
+          "name": "Notion account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "dataSourceId": {
+          "__rl": true,
+          "value": "3d2f3abf-c92e-800c-bcc5-000b49b5dfbf",
+          "mode": "list",
+          "cachedResultName": "📅 Agenda",
+          "cachedResultUrl": "https://app.notion.com/p/3d2f3abfc92e802690c8f5babd89da0f"
+        },
+        "limit": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Limit', ``, 'number') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notionTool",
+      "typeVersion": 3,
+      "position": [
+        624,
+        160
+      ],
+      "id": "51296d60-8baa-4d06-811d-bd7d33263cbb",
+      "name": "Get many database pages in Notion",
+      "credentials": {
+        "notionApi": {
+          "id": "QLfYP5IKzLwFy29u",
+          "name": "Notion account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "dataSourceId": {
+          "__rl": true,
+          "value": "3d2f3abf-c92e-800c-bcc5-000b49b5dfbf",
+          "mode": "list",
+          "cachedResultName": "📅 Agenda",
+          "cachedResultUrl": "https://app.notion.com/p/3d2f3abfc92e802690c8f5babd89da0f"
+        },
+        "title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Title', `reserva los turnos que se hagan con los datos que te den `, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notionTool",
+      "typeVersion": 3,
+      "position": [
+        512,
+        160
+      ],
+      "id": "ac99a456-9c31-4625-9095-8e4da9f2d176",
+      "name": "Create a database page in Notion",
+      "credentials": {
+        "notionApi": {
+          "id": "QLfYP5IKzLwFy29u",
+          "name": "Notion account 4"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "search in database": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "search in database1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many database pages in Notion": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a database page in Notion": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "22126a76-d8c0-46d5-a669-0b6f1e347b99",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0ec4754a037e14bc43e6840502d923218ab5ab904d402759c1332d6d3a5e72c2"
+  },
+  "nodeGroups": [],
+  "id": "gRepsxOxwS69ilIv",
+  "tags": []
+}
