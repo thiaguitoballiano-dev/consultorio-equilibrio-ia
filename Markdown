@@ -1,0 +1,25 @@
+MARKDOWN
+## 🔒 Seguridad, Resiliencia y Privacidad (Data Minimization & HITL)
+
+### 1. Minimización de Datos
+- El sistema opera bajo el principio de minimización de datos: el agente de IA solo recopila la información estrictamente necesaria para la gestión del turno (Nombre del paciente, motivo de consulta, profesional seleccionado, fecha y hora). No se almacenan datos sensibles ni historiales médicos detallados fuera de los campos autorizados en Notion.
+
+### 2. Manejo de Errores (Error Handlers)
+- **Fallos en herramientas (Tools):** Si una herramienta de Notion o Telegram falla o devuelve un error de API, n8n intercepta la excepción mediante nodos de control de errores para evitar que el bot colapse.
+- **Respuesta al usuario:** Ante cualquier fallo técnico, el sistema responde de forma elegante con un mensaje de mantenimiento o reintento, evitando exponer códigos de error crudos o datos internos del servidor.
+
+### 3. Protocolo Human-in-the-Loop (HITL)
+- **Validación previa a la escritura:** Para prevenir acciones accidentales o no autorizadas en la base de datos de la Agenda, el agente tiene prohibido ejecutar la herramienta de creación de turnos de forma automática.
+- **Flujo de confirmación:** El asistente obliga al usuario a verificar el resumen de la reserva en el chat y responder de manera afirmativa ("sí", "confirmo") antes de que n8n impacte el registro en Notion.
+
+---
+
+## 📂 Archivos Técnicos y Respaldos de Evidencia
+
+* **Blueprint / JSON del flujo de n8n:** Disponible en la carpeta `/workflows` de este repositorio bajo el nombre del flujo principal.
+* **Base de Datos (Modo Lectura):** [Enlace público a la base de datos de Notion](PEGAR_LINK_DE_NOTION_AQUI)
+* **Evidencias Visuales (`/docs`):**
+  * *Arquitectura en n8n:* Captura del flujo completo con el Agente y las Herramientas.
+  * *Chat de Telegram:* Demostración de la interacción, la recomendación de profesionales y el funcionamiento del HITL.
+  * *Base de Datos de Notion:* Registro de turnos impactados correctamente.
+  * *Dashboard:* Panel de KPIs y contadores automáticos funcionando.
