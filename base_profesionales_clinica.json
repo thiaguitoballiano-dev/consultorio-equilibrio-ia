@@ -1,0 +1,55 @@
+{
+  "proyecto": "Clinica Psicologica - Base de Profesionales",
+  "version": "1.0",
+  "descripcion": "Base simple de profesionales para utilizar como datos de prueba del agente.",
+  "profesionales": [
+    {
+      "id": 1,
+      "nombre": "Sofia Martinez",
+      "especialidad": "Ansiedad y estres",
+      "modalidad": "Virtual y presencial",
+      "dias_disponibles": "Lunes y miercoles",
+      "keywords": [
+        "ansiedad",
+        "estres",
+        "angustia"
+      ]
+    },
+    {
+      "id": 2,
+      "nombre": "Lucas Fernandez",
+      "especialidad": "Adolescentes y orientacion familiar",
+      "modalidad": "Virtual y presencial",
+      "dias_disponibles": "Martes y jueves",
+      "keywords": [
+        "adolescentes",
+        "familia",
+        "orientacion"
+      ]
+    },
+    {
+      "id": 3,
+      "nombre": "Valentina Gomez",
+      "especialidad": "Parejas y vinculos",
+      "modalidad": "Virtual",
+      "dias_disponibles": "Viernes",
+      "keywords": [
+        "pareja",
+        "vinculos",
+        "relaciones"
+      ]
+    },
+    {
+      "id": 4,
+      "nombre": "Martin Rodriguez",
+      "especialidad": "Autoestima y dificultades personales",
+      "modalidad": "Virtual y presencial",
+      "dias_disponibles": "Lunes y viernes",
+      "keywords": [
+        "autoestima",
+        "seguridad",
+        "dificultades personales"
+      ]
+    }
+  ]
+}
