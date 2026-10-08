@@ -1,0 +1,230 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ba855fcd-93bc-4458-ab30-22d325fe2cdd",
+      "name": "When chat message received",
+      "webhookId": "55b16a7a-3367-4195-a4fa-10e417535746"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Sos el asistente virtual del Consultorio Integral Equilibrio.\n\nTu objetivo es ayudar a los pacientes a:\n- consultar información del consultorio\n- encontrar psicólogos adecuados\n- consultar disponibilidad\n- gestionar turnos\n\nREGLAS:\n\n1. Sé amable, claro y profesional.\n2. Usá las herramientas de Notion para buscar información.\n3. Nunca inventes psicólogos, horarios, precios, servicios o datos.\n4. Si no encontrás un dato en las herramientas, decí que no tenés esa información.\n5. Para recomendar un psicólogo, primero entendé brevemente qué necesita el paciente y luego consultá la base de psicólogos.\n6. Para ofrecer turnos, consultá siempre la Agenda. Nunca inventes disponibilidad.\n7. Antes de realizar una acción importante, pedí confirmación al paciente.\n8. No reveles información privada de otros pacientes.\n9. Si el paciente pregunta algo que no podés resolver, indicá que debe comunicarse con el consultorio.\n\nIMPORTANTE:\nLa información de psicólogos, agenda, pacientes, FAQ y conversaciones está en las herramientas de Notion. Consultalas antes de responder cuando sea necesario.\n\nCuando te hablan sobre turnos usa la tool agendas\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "5ecae062-61f3-436e-8569-a90032fe0909",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        208
+      ],
+      "id": "b5a58ea2-c96f-4ae0-9d34-6ffb82de33d3",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "Qr5Nzzh8k65uwXuf",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        240,
+        208
+      ],
+      "id": "92c3e121-b6c8-4f26-b7d8-9e8d4ee48330",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "dataSourceId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "3d2f3abf-c92e-808f-8ede-000b5e21dafa",
+          "__regex": "^([0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12})"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notionTool",
+      "typeVersion": 3,
+      "position": [
+        560,
+        224
+      ],
+      "id": "de166074-348b-4ea4-9239-518ba672e860",
+      "name": "Get many database pages in Notion",
+      "credentials": {
+        "notionApi": {
+          "id": "QLfYP5IKzLwFy29u",
+          "name": "Notion account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "dataSourceId": {
+          "__rl": true,
+          "value": "3d2f3abf-c92e-800c-bcc5-000b49b5dfbf",
+          "mode": "list",
+          "cachedResultName": "📅 Agenda",
+          "cachedResultUrl": "https://app.notion.com/p/3d2f3abfc92e802690c8f5babd89da0f"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notionTool",
+      "typeVersion": 3,
+      "position": [
+        400,
+        192
+      ],
+      "id": "92683daf-793b-44d5-964f-74cd1a81b748",
+      "name": "Get many database pages in Notion1",
+      "credentials": {
+        "notionApi": {
+          "id": "QLfYP5IKzLwFy29u",
+          "name": "Notion account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "thiaguitoballiano@gmail.com",
+        "subject": "consultorio equilibrio",
+        "message": "hola soy de consultorio equilibrio, cualquier cosa estoy aca",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        592,
+        0
+      ],
+      "id": "01ac559b-fe90-4d76-a46d-a897edf3191c",
+      "name": "Send a message",
+      "webhookId": "0a235ad4-a1d5-4eb5-90ec-8a694bc7e754",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "PgSE9i7foQS6oGjK",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many database pages in Notion": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many database pages in Notion1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f23ab4d0-154f-4863-b26c-89f592ecca6f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0ec4754a037e14bc43e6840502d923218ab5ab904d402759c1332d6d3a5e72c2"
+  },
+  "nodeGroups": [],
+  "id": "X7qUXBbDBxdeRl8I",
+  "tags": []
+}
